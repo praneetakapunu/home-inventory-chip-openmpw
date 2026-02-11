@@ -1,0 +1,3 @@
+[submodule "ip/home-inventory-chip"]
+	path = ip/home-inventory-chip
+	url = https://github.com/praneetakapunu/home-inventory-chip.git
