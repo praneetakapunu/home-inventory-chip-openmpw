@@ -1,4 +1,4 @@
-# SPDX-FileCopyrightText: 2023 Efabless Corporation
+# SPDX-FileCopyrightText: 2026
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,12 +14,5 @@
 
 # SPDX-License-Identifier: Apache-2.0
 
-# yaml file contain general design information that would mostly need to be updated in the first run only 
-includes: 
-    - counter_la/counter_la.yaml
-    - counter_wb/counter_wb.yaml
-    - counter_la_reset/counter_la_reset.yaml
-    - counter_la_clk/counter_la_clk.yaml
-    - home_inventory_wb_smoke/home_inventory_wb_smoke.yaml
-
-
+Tests:
+    - {name: home_inventory_wb_smoke, sim: RTL}
