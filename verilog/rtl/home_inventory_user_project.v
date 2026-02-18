@@ -11,7 +11,7 @@
 // Pull in the regblock RTL from the source-of-truth repo.
 // NOTE: This is a temporary, explicit include to keep the harness build simple.
 //       Longer-term, we should plumb the submodule RTL into the build filelist.
-`include "../../ip/home-inventory-chip/rtl/home_inventory_wb.v"
+`include "ip/home-inventory-chip/rtl/home_inventory_wb.v"
 
 module home_inventory_user_project #(
     parameter BITS = 32
