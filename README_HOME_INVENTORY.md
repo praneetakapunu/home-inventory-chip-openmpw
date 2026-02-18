@@ -13,6 +13,18 @@ It is included in this repo as a submodule:
 - Keep OpenMPW-specific structure, Makefiles, and precheck CI here.
 - Pull the actual user design RTL (and later, hardened macros) from the source-of-truth repo.
 
+## Quick sanity check (no OpenLane / low disk)
+From the repo root:
+
+```bash
+make rtl-compile-check
+```
+
+This runs a fast Icarus compile of:
+- `verilog/rtl/user_project_wrapper.v`
+- `verilog/rtl/home_inventory_user_project.v`
+- the submodule RTL listed in `verilog/rtl/ip_home_inventory.f`
+
 ## Next steps
-- Create a minimal user-project RTL wrapper that instantiates our top.
-- Configure OpenLane for SKY130A and run mpw-precheck early.
+- Add a tiny cocotb test that smoke-reads ID/VERSION over Wishbone.
+- Configure OpenLane for SKY130A and run mpw-precheck when disk/tooling allows.

@@ -8,10 +8,11 @@
 
 `default_nettype none
 
-// Pull in the regblock RTL from the source-of-truth repo.
-// NOTE: This is a temporary, explicit include to keep the harness build simple.
-//       Longer-term, we should plumb the submodule RTL into the build filelist.
-`include "ip/home-inventory-chip/rtl/home_inventory_wb.v"
+// Source-of-truth RTL is compiled from the submodule via the harness filelist:
+//   verilog/rtl/ip_home_inventory.f
+//
+// In particular, this wrapper expects `home_inventory_wb` to be available
+// (compiled from: ip/home-inventory-chip/rtl/home_inventory_wb.v).
 
 module home_inventory_user_project #(
     parameter BITS = 32
