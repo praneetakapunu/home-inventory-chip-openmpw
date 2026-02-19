@@ -314,8 +314,12 @@ check-pdk:
 		exit 1; \
 	fi
 
+.PHONY: sync-ip-filelist
+sync-ip-filelist:
+	@./ops/sync_ip_filelist.sh
+
 .PHONY: rtl-compile-check
-rtl-compile-check:
+rtl-compile-check: sync-ip-filelist
 	@command -v iverilog >/dev/null 2>&1 || (echo "ERROR: iverilog not found in PATH" && exit 1)
 	iverilog -g2012 -o /tmp/home_inventory_rtl_check.out \
 		-I verilog/rtl \
