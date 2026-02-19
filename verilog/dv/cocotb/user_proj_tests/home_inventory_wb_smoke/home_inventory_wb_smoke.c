@@ -55,7 +55,7 @@ void main() {
     const int OFF_CTRL     = 0x0100 / 4;
     const int OFF_ADC_CFG  = 0x0200 / 4;
 
-    // --- Basic ID/version ---
+    // --- Basic ID/version (read-only) ---
     const unsigned int id = (unsigned int)USER_readWord(OFF_ID);
     const unsigned int ver = (unsigned int)USER_readWord(OFF_VERSION);
 
@@ -64,6 +64,16 @@ void main() {
     }
     if (ver != 0x00000001u) {
         fail(0x002);
+    }
+
+    // Attempt to clobber RO regs; reads must remain unchanged.
+    USER_writeWord(0x00000000u, OFF_ID);
+    USER_writeWord(0xFFFFFFFFu, OFF_VERSION);
+    if (((unsigned int)USER_readWord(OFF_ID)) != id) {
+        fail(0x003);
+    }
+    if (((unsigned int)USER_readWord(OFF_VERSION)) != ver) {
+        fail(0x004);
     }
 
     // --- RW behavior: ADC_CFG lower bits should store, reserved bits zero ---
@@ -82,14 +92,22 @@ void main() {
     if ((ctrl1 & 0x1u) != 0x1u) {
         fail(0x020);
     }
+    // Reserved bits should read as 0.
+    if ((ctrl1 & 0xFFFFFFFEu) != 0u) {
+        fail(0x023);
+    }
 
-    USER_writeWord(0x00000003u, OFF_CTRL); // ENABLE=1, START=1
+    // Try writing garbage into reserved bits; should be ignored.
+    USER_writeWord(0x80000003u, OFF_CTRL); // ENABLE=1, START=1, RESERVED=1
     const unsigned int ctrl2 = (unsigned int)USER_readWord(OFF_CTRL);
     if ((ctrl2 & 0x1u) != 0x1u) {
         fail(0x021);
     }
     if ((ctrl2 & 0x2u) != 0u) {
         fail(0x022);
+    }
+    if ((ctrl2 & 0xFFFFFFFEu) != 0u) {
+        fail(0x024);
     }
 
     // PASS: set user GPIO0 high and signal completion.
