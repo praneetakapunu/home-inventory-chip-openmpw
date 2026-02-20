@@ -4,4 +4,5 @@ from user_proj_tests.counter_wb.counter_wb import counter_wb
 from user_proj_tests.counter_la.counter_la import counter_la
 from user_proj_tests.counter_la_reset.counter_la_reset import counter_la_reset
 from user_proj_tests.counter_la_clk.counter_la_clk import counter_la_clk
+from user_proj_tests.home_inventory_wb_smoke.home_inventory_wb_smoke import home_inventory_wb_smoke
 from gpio_test.gpio_test import gpio_test
