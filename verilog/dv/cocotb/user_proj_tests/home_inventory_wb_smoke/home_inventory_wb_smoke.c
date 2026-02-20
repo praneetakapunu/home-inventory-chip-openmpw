@@ -49,11 +49,22 @@ void main() {
     User_enableIF();
 
     // --- Register offsets (word addressed) ---
-    // See chip-inventory/spec/regmap.md
-    const int OFF_ID       = 0x0000 / 4;
-    const int OFF_VERSION  = 0x0004 / 4;
-    const int OFF_CTRL     = 0x0100 / 4;
-    const int OFF_ADC_CFG  = 0x0200 / 4;
+    // Keep these consistent with chip-inventory/spec/regmap_v1.yaml.
+    const int OFF_ID              = 0x0000 / 4;
+    const int OFF_VERSION         = 0x0004 / 4;
+
+    const int OFF_CTRL            = 0x0100 / 4;
+    const int OFF_IRQ_EN          = 0x0104 / 4;
+    const int OFF_STATUS          = 0x0108 / 4;
+
+    const int OFF_ADC_CFG         = 0x0200 / 4;
+    const int OFF_ADC_CMD         = 0x0204 / 4;
+    const int OFF_ADC_FIFO_STATUS = 0x0208 / 4;
+    const int OFF_ADC_FIFO_DATA   = 0x020C / 4;
+    const int OFF_ADC_RAW_CH0     = 0x0210 / 4;
+
+    const int OFF_TARE_CH0        = 0x0300 / 4;
+    const int OFF_SCALE_CH0       = 0x0320 / 4;
 
     // --- Basic ID/version (read-only) ---
     const unsigned int id = (unsigned int)USER_readWord(OFF_ID);
@@ -108,6 +119,55 @@ void main() {
     }
     if ((ctrl2 & 0xFFFFFFFEu) != 0u) {
         fail(0x024);
+    }
+
+    // --- IRQ_EN: only low 3 bits should stick ---
+    USER_writeWord(0xFFFFFFFFu, OFF_IRQ_EN);
+    const unsigned int irq_en = (unsigned int)USER_readWord(OFF_IRQ_EN);
+    if ((irq_en & 0x7u) != 0x7u) {
+        fail(0x030);
+    }
+    if ((irq_en & 0xFFFFFFF8u) != 0u) {
+        fail(0x031);
+    }
+
+    // STATUS is RO; it should always have reserved bits == 0.
+    const unsigned int status = (unsigned int)USER_readWord(OFF_STATUS);
+    if ((status & 0xFFFFFF00u) != 0u) {
+        fail(0x032);
+    }
+
+    // --- Calibration regs: TARE and SCALE should be full RW ---
+    USER_writeWord(0xA5A55A5Au, OFF_TARE_CH0);
+    if (((unsigned int)USER_readWord(OFF_TARE_CH0)) != 0xA5A55A5Au) {
+        fail(0x040);
+    }
+
+    USER_writeWord(0x00020000u, OFF_SCALE_CH0); // Q16.16 = 2.0
+    if (((unsigned int)USER_readWord(OFF_SCALE_CH0)) != 0x00020000u) {
+        fail(0x041);
+    }
+
+    // --- ADC snapshot path (stub) + FIFO pop behavior ---
+    const unsigned int raw0_before = (unsigned int)USER_readWord(OFF_ADC_RAW_CH0);
+    USER_writeWord(0x00000001u, OFF_ADC_CMD); // SNAPSHOT pulse
+    const unsigned int raw0_after = (unsigned int)USER_readWord(OFF_ADC_RAW_CH0);
+    if (raw0_after == raw0_before) {
+        fail(0x050);
+    }
+
+    const unsigned int fifo_status0 = (unsigned int)USER_readWord(OFF_ADC_FIFO_STATUS);
+    const unsigned int level0 = (fifo_status0 & 0xFFFFu);
+    if (level0 == 0u) {
+        fail(0x051);
+    }
+
+    // Pop one word and confirm level decrements by 1.
+    (void)USER_readWord(OFF_ADC_FIFO_DATA);
+    const unsigned int fifo_status1 = (unsigned int)USER_readWord(OFF_ADC_FIFO_STATUS);
+    const unsigned int level1 = (fifo_status1 & 0xFFFFu);
+    if (level1 != (level0 - 1u)) {
+        fail(0x052);
     }
 
     // PASS: set user GPIO0 high and signal completion.
