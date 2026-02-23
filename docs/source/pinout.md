@@ -22,8 +22,13 @@ Currently **not driven** by the design.
 - `la_data_in/la_oenb` are ignored
 
 ### GPIO / analog IO
-Currently **unused** by v1.
+Currently **unused** by v1 (all GPIOs high-Z).
 
+However, v1 *will* need GPIO routing for the external ADS131M08 ADC (SPI + DRDY + reset). The plan to lock exact `io[*]` assignments lives here:
+
+- `docs/source/adc_pinout_plan.md`
+
+Current behavior:
 - `io_out` = 0
 - `io_oeb` = 1 (all GPIOs high-Z)
 - `analog_io` not used
