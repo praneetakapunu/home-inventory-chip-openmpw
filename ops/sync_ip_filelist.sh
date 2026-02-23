@@ -47,6 +47,9 @@ if [[ -f "${OUT_F}" ]] && cmp -s "${tmp}" "${OUT_F}"; then
 fi
 
 mv "${tmp}" "${OUT_F}"
+# Ensure the generated file isn't accidentally left unreadable (e.g. if a prior
+# version had restrictive perms).
+chmod 0644 "${OUT_F}" || true
 trap - EXIT
 
 echo "OK: updated ${OUT_F}"

@@ -5,6 +5,7 @@
 ## Table of Contents
 
 - [Overview](#overview)
+- [Pinout (v1 contract)](pinout.md)
 - [Quickstart](#quickstart)
 - [Caravel Integration](#caravel-integration)
   - [Repo Integration](#repo-integration)
