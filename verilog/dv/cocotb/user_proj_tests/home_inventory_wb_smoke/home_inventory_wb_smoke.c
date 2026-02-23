@@ -61,10 +61,28 @@ void main() {
     const int OFF_ADC_CMD         = 0x0204 / 4;
     const int OFF_ADC_FIFO_STATUS = 0x0208 / 4;
     const int OFF_ADC_FIFO_DATA   = 0x020C / 4;
-    const int OFF_ADC_RAW_CH0     = 0x0210 / 4;
+    const int OFF_ADC_RAW_CH0         = 0x0210 / 4;
+    const int OFF_ADC_SNAPSHOT_COUNT  = 0x0230 / 4;
 
-    const int OFF_TARE_CH0        = 0x0300 / 4;
-    const int OFF_SCALE_CH0       = 0x0320 / 4;
+    const int OFF_TARE_CH0            = 0x0300 / 4;
+    const int OFF_SCALE_CH0           = 0x0320 / 4;
+
+    // --- Reset defaults (normative, from chip-inventory/spec/regmap_v1.yaml) ---
+    if (((unsigned int)USER_readWord(OFF_CTRL)) != 0x00000000u) {
+        fail(0x100);
+    }
+    if (((unsigned int)USER_readWord(OFF_IRQ_EN)) != 0x00000000u) {
+        fail(0x101);
+    }
+    if (((unsigned int)USER_readWord(OFF_ADC_CFG)) != 0x00000000u) {
+        fail(0x102);
+    }
+    if (((unsigned int)USER_readWord(OFF_TARE_CH0)) != 0x00000000u) {
+        fail(0x103);
+    }
+    if (((unsigned int)USER_readWord(OFF_SCALE_CH0)) != 0x00010000u) {
+        fail(0x104);
+    }
 
     // --- Basic ID/version (read-only) ---
     const unsigned int id = (unsigned int)USER_readWord(OFF_ID);
@@ -149,11 +167,20 @@ void main() {
     }
 
     // --- ADC snapshot path (stub) + FIFO pop behavior ---
+    const unsigned int snap_cnt0 = (unsigned int)USER_readWord(OFF_ADC_SNAPSHOT_COUNT);
     const unsigned int raw0_before = (unsigned int)USER_readWord(OFF_ADC_RAW_CH0);
+
     USER_writeWord(0x00000001u, OFF_ADC_CMD); // SNAPSHOT pulse
+
+    const unsigned int snap_cnt1 = (unsigned int)USER_readWord(OFF_ADC_SNAPSHOT_COUNT);
     const unsigned int raw0_after = (unsigned int)USER_readWord(OFF_ADC_RAW_CH0);
+
+    // Snapshot should update raw regs (at least CH0) and increment the counter.
     if (raw0_after == raw0_before) {
         fail(0x050);
+    }
+    if (snap_cnt1 != (snap_cnt0 + 1u)) {
+        fail(0x053);
     }
 
     const unsigned int fifo_status0 = (unsigned int)USER_readWord(OFF_ADC_FIFO_STATUS);
