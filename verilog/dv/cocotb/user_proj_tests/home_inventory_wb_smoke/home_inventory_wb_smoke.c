@@ -235,6 +235,45 @@ void main() {
         fail(0x068);
     }
 
+    // Regression: "glitchy" enable pulse should NOT clear history if we never
+    // take a sample while enabled.
+    // Sequence: briefly raise EVT_EN then disable again before snapshot.
+    const unsigned int evt_last_ts3 = (unsigned int)USER_readWord(OFF_EVT_LAST_TS);
+
+    USER_writeWord(0x00000000u, OFF_EVT_CFG);
+    USER_writeWord(0x00000001u, OFF_EVT_CFG); // 0->1 edge (pending)
+    USER_writeWord(0x00000000u, OFF_EVT_CFG); // back to disabled before sample
+
+    USER_writeWord(0x00000001u, OFF_ADC_CMD); // SNAPSHOT pulse (while disabled)
+
+    const unsigned int evt_cnt_glitch = (unsigned int)USER_readWord(OFF_EVT_COUNT_CH0);
+    const unsigned int evt_delta_glitch = (unsigned int)USER_readWord(OFF_EVT_LAST_DELTA_CH0);
+    const unsigned int evt_last_ts_glitch = (unsigned int)USER_readWord(OFF_EVT_LAST_TS);
+
+    if (evt_cnt_glitch != evt_cnt3) {
+        fail(0x069);
+    }
+    if (evt_delta_glitch != evt_delta3) {
+        fail(0x06A);
+    }
+    if (evt_last_ts_glitch != evt_last_ts3) {
+        fail(0x06B);
+    }
+
+    // True re-enable + snapshot should clear history: delta back to 0.
+    USER_writeWord(0x00000001u, OFF_EVT_CFG);
+    USER_writeWord(0x00000001u, OFF_ADC_CMD); // SNAPSHOT pulse
+
+    const unsigned int evt_cnt4 = (unsigned int)USER_readWord(OFF_EVT_COUNT_CH0);
+    const unsigned int evt_delta4 = (unsigned int)USER_readWord(OFF_EVT_LAST_DELTA_CH0);
+
+    if (evt_cnt4 != (evt_cnt3 + 1u)) {
+        fail(0x06C);
+    }
+    if (evt_delta4 != 0u) {
+        fail(0x06D);
+    }
+
     // --- ADC snapshot path (stub) + FIFO pop behavior ---
     const unsigned int snap_cnt0 = (unsigned int)USER_readWord(OFF_ADC_SNAPSHOT_COUNT);
     const unsigned int raw0_before = (unsigned int)USER_readWord(OFF_ADC_RAW_CH0);
