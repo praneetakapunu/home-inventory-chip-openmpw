@@ -166,6 +166,75 @@ void main() {
         fail(0x041);
     }
 
+    // --- Events regs (stubbed-by-snapshot): basic semantics ---
+    const int OFF_EVT_COUNT_CH0      = 0x0400 / 4;
+    const int OFF_EVT_LAST_DELTA_CH0 = 0x0420 / 4;
+    const int OFF_EVT_LAST_TS        = 0x0440 / 4;
+    const int OFF_EVT_CFG            = 0x0444 / 4;
+    const int OFF_EVT_THRESH_CH0     = 0x0480 / 4;
+
+    // Reset defaults
+    if (((unsigned int)USER_readWord(OFF_EVT_CFG)) != 0x00000000u) {
+        fail(0x060);
+    }
+
+    // Program threshold so our deterministic snapshot sample will always hit.
+    USER_writeWord(0x00000000u, OFF_EVT_THRESH_CH0);
+
+    // Enable CH0.
+    USER_writeWord(0x00000001u, OFF_EVT_CFG);
+
+    // First snapshot should fire an event: count increments, delta = 0.
+    USER_writeWord(0x00000001u, OFF_ADC_CMD); // SNAPSHOT pulse
+
+    const unsigned int evt_cnt1 = (unsigned int)USER_readWord(OFF_EVT_COUNT_CH0);
+    const unsigned int evt_delta1 = (unsigned int)USER_readWord(OFF_EVT_LAST_DELTA_CH0);
+    const unsigned int evt_last_ts1 = (unsigned int)USER_readWord(OFF_EVT_LAST_TS);
+
+    if (evt_cnt1 != 1u) {
+        fail(0x061);
+    }
+    if (evt_delta1 != 0u) {
+        fail(0x062);
+    }
+    if (evt_last_ts1 == 0u) {
+        // With our stub, ts increments starting at 1, so this should be nonzero.
+        fail(0x063);
+    }
+
+    // Second snapshot should fire again: count increments, delta = 1 (ts_now increments by 1).
+    USER_writeWord(0x00000001u, OFF_ADC_CMD); // SNAPSHOT pulse
+
+    const unsigned int evt_cnt2 = (unsigned int)USER_readWord(OFF_EVT_COUNT_CH0);
+    const unsigned int evt_delta2 = (unsigned int)USER_readWord(OFF_EVT_LAST_DELTA_CH0);
+    const unsigned int evt_last_ts2 = (unsigned int)USER_readWord(OFF_EVT_LAST_TS);
+
+    if (evt_cnt2 != 2u) {
+        fail(0x064);
+    }
+    if (evt_delta2 != 1u) {
+        fail(0x065);
+    }
+    if (evt_last_ts2 != (evt_last_ts1 + 1u)) {
+        fail(0x066);
+    }
+
+    // Disable + re-enable should clear history so the next event has delta = 0.
+    USER_writeWord(0x00000000u, OFF_EVT_CFG);
+    USER_writeWord(0x00000001u, OFF_EVT_CFG);
+
+    USER_writeWord(0x00000001u, OFF_ADC_CMD); // SNAPSHOT pulse
+
+    const unsigned int evt_cnt3 = (unsigned int)USER_readWord(OFF_EVT_COUNT_CH0);
+    const unsigned int evt_delta3 = (unsigned int)USER_readWord(OFF_EVT_LAST_DELTA_CH0);
+
+    if (evt_cnt3 != 3u) {
+        fail(0x067);
+    }
+    if (evt_delta3 != 0u) {
+        fail(0x068);
+    }
+
     // --- ADC snapshot path (stub) + FIFO pop behavior ---
     const unsigned int snap_cnt0 = (unsigned int)USER_readWord(OFF_ADC_SNAPSHOT_COUNT);
     const unsigned int raw0_before = (unsigned int)USER_readWord(OFF_ADC_RAW_CH0);
