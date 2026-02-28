@@ -2,3 +2,5 @@ sim/
 *.log
 *.vcd 
 *.pyc
+# Per-machine cocotb path overrides
+design_info.local.yaml

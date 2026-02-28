@@ -1,0 +1,17 @@
+# Local override for Cocotb/Caravel tests.
+#
+# Copy to `design_info.local.yaml` (ignored by git) and update paths for your machine.
+# Then run:
+#   caravel_cocotb -t <test> -tag <tag> -design_info verilog/dv/cocotb/design_info.local.yaml
+#
+# NOTE: Keep `design_info.yaml` in the repo pointing at the container defaults.
+
+CARAVEL_ROOT: /path/to/your/home-inventory-chip-openmpw/caravel
+MCW_ROOT: /path/to/your/home-inventory-chip-openmpw/mgmt_core_wrapper
+PDK: sky130A
+PDK_ROOT: /path/to/your/home-inventory-chip-openmpw/dependencies/pdks
+USER_PROJECT_ROOT: /path/to/your/home-inventory-chip-openmpw
+caravan: false
+clk: 25
+emailto:
+- null

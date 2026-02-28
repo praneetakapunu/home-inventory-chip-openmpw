@@ -35,7 +35,9 @@ Run tests
 # run from different directory
     ```bash
     caravel_cocotb -t hello_world_uart -tag hello_world -design_info <path to design_info.yaml>
-    ```      
+    ```
+
+For running outside the container, copy `design_info.local.yaml.example` to `design_info.local.yaml` (git-ignored) and point `-design_info` to it.
 # run with changing the results directory
     ```bash
     caravel_cocotb -t hello_world_uart -tag hello_world -sim  <path to results directory>
