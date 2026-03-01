@@ -378,10 +378,10 @@ cocotb-verify-all-rtl:
 cocotb-verify-all-gl:
 	@(cd $(PROJECT_ROOT)/verilog/dv/cocotb && $(PROJECT_ROOT)/venv-cocotb/bin/caravel_cocotb -di $(PROJECT_ROOT)/verilog/dv/cocotb/design_info.yaml -tl user_proj_tests/user_proj_tests_gl.yaml -sim GL)
 
-$(cocotb-dv-targets-rtl): cocotb-verify-%-rtl: 
+$(cocotb-dv-targets-rtl): cocotb-verify-%-rtl: setup-cocotb-env
 	@(cd $(PROJECT_ROOT)/verilog/dv/cocotb && $(PROJECT_ROOT)/venv-cocotb/bin/caravel_cocotb -di $(PROJECT_ROOT)/verilog/dv/cocotb/design_info.yaml -t $*  )
 	
-$(cocotb-dv-targets-gl): cocotb-verify-%-gl:
+$(cocotb-dv-targets-gl): cocotb-verify-%-gl: setup-cocotb-env
 	@(cd $(PROJECT_ROOT)/verilog/dv/cocotb && $(PROJECT_ROOT)/venv-cocotb/bin/caravel_cocotb -di $(PROJECT_ROOT)/verilog/dv/cocotb/design_info.yaml -t $* -sim GL)
 
 ./verilog/gl/user_project_wrapper.v:
