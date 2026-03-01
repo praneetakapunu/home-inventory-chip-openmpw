@@ -24,14 +24,20 @@ Currently **not driven** by the design.
 ### GPIO / analog IO
 Currently **unused** by v1 (all GPIOs high-Z).
 
-However, v1 *will* need GPIO routing for the external ADS131M08 ADC (SPI + DRDY + reset). The plan to lock exact `io[*]` assignments lives here:
+However, v1 will eventually need GPIO routing for the external ADS131M08 ADC (SPI + DRDY + reset).
 
+Where the plan lives:
 - `docs/source/adc_pinout_plan.md`
 
-Current behavior:
-- `io_out` = 0
-- `io_oeb` = 1 (all GPIOs high-Z)
-- `analog_io` not used
+Current wrapper behavior (`verilog/rtl/home_inventory_user_project.v`):
+- Default (no special defines):
+  - `io_out` = 0
+  - `io_oeb` = 1 (all GPIOs high-Z)
+  - `analog_io` not used
+- Optional (compile-time) ADC GPIO routing:
+  - Guard: `HOMEINV_ENABLE_ADC_GPIO`
+  - The wrapper exposes *parameterized* `io[*]` indices (`ADC_SCLK_IO`, `ADC_CSN_IO`, ...)
+  - **Those default indices are placeholders** and must be explicitly locked/updated before any tapeout build enables this path.
 
 ### user_clock2
 Currently **unused** by v1.
