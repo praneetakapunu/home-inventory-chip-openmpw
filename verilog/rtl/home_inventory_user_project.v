@@ -105,10 +105,14 @@ module home_inventory_user_project #(
     wire [7:0] core_status = 8'h00;
 
     // -----------------------------------------------------------------
-    // External ADC interface wires (placeholder)
+    // External ADC interface wires
     // -----------------------------------------------------------------
-    // The IP core does not yet expose these; keep safe defaults so that
-    // enabling HOMEINV_ENABLE_ADC_GPIO is non-destructive.
+    // These wires serve *two* purposes:
+    // 1) Optional GPIO routing to Caravel pads (HOMEINV_ENABLE_ADC_GPIO)
+    // 2) Optional real ADC SPI capture inside the IP (USE_REAL_ADC_INGEST)
+    //
+    // Safety: when USE_REAL_ADC_INGEST is not enabled, keep safe defaults
+    // so that enabling HOMEINV_ENABLE_ADC_GPIO is non-destructive.
     wire adc_sclk;
     wire adc_cs_n;
     wire adc_mosi;
@@ -116,9 +120,13 @@ module home_inventory_user_project #(
     wire adc_miso;
     wire adc_drdy_n;
 
+`ifndef USE_REAL_ADC_INGEST
     assign adc_sclk  = 1'b0;
     assign adc_cs_n  = 1'b1;
     assign adc_mosi  = 1'b0;
+`endif
+
+    // Reset is not yet owned by the IP; keep it deasserted.
     assign adc_rst_n = 1'b1;
 
 `ifdef HOMEINV_ENABLE_ADC_GPIO
@@ -152,6 +160,16 @@ module home_inventory_user_project #(
         .ctrl_enable(ctrl_enable),
         .ctrl_start (ctrl_start),
         .irq_en     (irq_en)
+
+`ifdef USE_REAL_ADC_INGEST
+        ,
+        // Real ADC SPI pins are only present on the IP block when
+        // USE_REAL_ADC_INGEST is enabled.
+        .adc_sclk(adc_sclk),
+        .adc_cs_n(adc_cs_n),
+        .adc_mosi(adc_mosi),
+        .adc_miso(adc_miso)
+`endif
     );
 
     // TODO(next): integrate the sampling core and drive status/IRQs.
