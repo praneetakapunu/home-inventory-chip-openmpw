@@ -330,6 +330,20 @@ rtl-compile-check: sync-ip-filelist
 		verilog/rtl/user_project_wrapper.v
 	@echo "OK: wrote /tmp/home_inventory_rtl_check.out"
 
+# Compile-check with real ADC ingest path enabled.
+# This exercises the USE_REAL_ADC_INGEST wiring without needing to run any DV.
+.PHONY: rtl-compile-check-real-adc
+rtl-compile-check-real-adc: sync-ip-filelist
+	@command -v iverilog >/dev/null 2>&1 || (echo "ERROR: iverilog not found in PATH" && exit 1)
+	iverilog -g2012 -D USE_REAL_ADC_INGEST -o /tmp/home_inventory_rtl_check_real_adc.out \
+		-I verilog/rtl \
+		-I ip/home-inventory-chip/rtl \
+		verilog/rtl/defines.v \
+		-f verilog/rtl/ip_home_inventory.f \
+		verilog/rtl/home_inventory_user_project.v \
+		verilog/rtl/user_project_wrapper.v
+	@echo "OK: wrote /tmp/home_inventory_rtl_check_real_adc.out"
+
 .PHONY: help
 help:
 	cd $(CARAVEL_ROOT) && $(MAKE) help
