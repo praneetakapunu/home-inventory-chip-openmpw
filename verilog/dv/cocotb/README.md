@@ -37,7 +37,17 @@ Run tests
     caravel_cocotb -t hello_world_uart -tag hello_world -design_info <path to design_info.yaml>
     ```
 
-For running outside the container, copy `design_info.local.yaml.example` to `design_info.local.yaml` (git-ignored) and point `-design_info` to it.
+For running outside the container, keep `design_info.yaml` as-is (container defaults) and use a per-machine override:
+
+Option A (recommended): generate `design_info.local.yaml` automatically:
+```bash
+verilog/dv/cocotb/mk_design_info_local.sh
+caravel_cocotb -t hello_world_uart -tag hello_world \
+  -design_info verilog/dv/cocotb/design_info.local.yaml
+```
+
+Option B: copy `design_info.local.yaml.example` to `design_info.local.yaml` (git-ignored) and edit paths.
+
 # run with changing the results directory
     ```bash
     caravel_cocotb -t hello_world_uart -tag hello_world -sim  <path to results directory>
