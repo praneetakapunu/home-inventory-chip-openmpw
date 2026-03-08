@@ -17,6 +17,7 @@ ip/home-inventory-chip/rtl/home_inventory_event_detector.v
 ip/home-inventory-chip/rtl/adc/adc_drdy_sync.v
 ip/home-inventory-chip/rtl/adc/adc_stream_fifo.v
 ip/home-inventory-chip/rtl/adc/adc_spi_frame_capture.v
+ip/home-inventory-chip/rtl/adc/adc_soc_frame_unpack.v
 ip/home-inventory-chip/rtl/adc/adc_frame_to_fifo.v
 ip/home-inventory-chip/rtl/adc/adc_streaming_ingest.v
 ip/home-inventory-chip/rtl/home_inventory_top.v
