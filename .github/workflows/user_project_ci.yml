@@ -22,6 +22,10 @@ jobs:
         run: |
           make rtl-compile-check
 
+      - name: Compile RTL with real ADC ingest enabled (wiring sanity)
+        run: |
+          make rtl-compile-check-real-adc
+
   # Heavy jobs (OpenLane/PDK/precheck) are intentionally not run on every push.
   # Disk/time requirements are large; run these manually when needed.
   heavy-openmpw:

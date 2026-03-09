@@ -10,7 +10,11 @@ This repo is the OpenMPW/Caravel submission harness.
 - `make rtl-compile-check`
   - installs iverilog
   - syncs the RTL filelist from the IP submodule
-  - compiles the wrapper + user project RTL
+  - compiles the wrapper + user project RTL (default/stub mode)
+
+- `make rtl-compile-check-real-adc`
+  - same as above, but defines `USE_REAL_ADC_INGEST`
+  - catches wrapper/IP drift in the real-ADC wiring without running full DV
 
 ## Heavy CI (manual)
 Hardening / PDK downloads / OpenLane / mpw-precheck are disabled by default and should be executed only when:
