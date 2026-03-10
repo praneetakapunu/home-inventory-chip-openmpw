@@ -23,8 +23,17 @@ Minimum viable external interface for ADS131M08 data capture:
 - `adc_drdy_n` (DRDY asserts low)
 
 Optional / future:
-- `adc_clkin` (if we decide to drive CLKIN from SoC)
+- `adc_clkin` (ONLY if we decide to drive `CLKIN` from the SoC)
 - `adc_sync_reset` (SYNC/RESET function)
+
+### Critical note: CLKIN is non-optional for real conversions
+The ADS131M08 requires a **continuous, free-running master clock on `CLKIN`** for normal operation.
+
+That means we must close one of these before tapeout:
+- The harness/PCB provides an oscillator into `CLKIN`, **or**
+- We explicitly route and drive `adc_clkin` from a known SoC clock output.
+
+Tracking decision record (IP repo): `ip/home-inventory-chip/decisions/011-adc-clkin-source-and-frequency.md`.
 
 ## Constraints to verify (before we lock pin numbers)
 1) Which `io[*]` pads are available on the OpenMPW harness for user projects.
@@ -38,12 +47,19 @@ Optional / future:
 ## Proposed mapping (placeholders; DO NOT TAPEOUT AS-IS)
 We will lock exact pad indices only after confirming harness constraints.
 
-- `adc_sclk`   → `io[??]` (output)
-- `adc_cs_n`   → `io[??]` (output)
-- `adc_mosi`   → `io[??]` (output)
-- `adc_miso`   → `io[??]` (input)
-- `adc_drdy_n` → `io[??]` (input)
-- `adc_rst_n`  → `io[??]` (output)
+| Signal | Dir | Caravel GPIO | Default/safe state (during reset + until FW config) |
+|---|---:|---:|---|
+| `adc_sclk` | out | `io[??]` | drive low (no toggles) |
+| `adc_cs_n` | out | `io[??]` | drive high (deassert) |
+| `adc_mosi` | out | `io[??]` | drive low |
+| `adc_miso` | in  | `io[??]` | input; ignore until streaming enabled |
+| `adc_drdy_n` | in | `io[??]` | input with pull-up if available; treat as active-low |
+| `adc_rst_n` | out | `io[??]` | drive low during reset, then high |
+| `adc_clkin` *(optional)* | out | `io[??]` | if used: drive continuous clock; otherwise **do not route** |
+
+Notes:
+- `adc_cs_n` must not glitch low during reset (would cause unintended frames if `adc_sclk` is active).
+- If we do **not** route `adc_clkin`, the harness/PCB **must** provide an oscillator into `CLKIN` (see note above).
 
 ## Lock procedure (what “done” means)
 When we lock the mapping, we must do all of the following in the same PR (or tightly coupled PRs):
