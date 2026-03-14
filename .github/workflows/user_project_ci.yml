@@ -26,6 +26,10 @@ jobs:
         run: |
           make rtl-compile-check-real-adc
 
+      - name: Sim smoke: WB FIFO pop semantics with real ADC ingest
+        run: |
+          make -C ip/home-inventory-chip/verify wb-real-adc-smoke-sim
+
   # Heavy jobs (OpenLane/PDK/precheck) are intentionally not run on every push.
   # Disk/time requirements are large; run these manually when needed.
   heavy-openmpw:
