@@ -6,8 +6,9 @@ It exists to unblock tapeout integration work *before* the ADC core RTL is fully
 
 Related:
 - Harness pinout contract: `docs/source/pinout.md`
+- Harness clocking contract: `docs/source/adc_clocking_plan.md`
 - ADC interface assumptions (IP repo): `ip/home-inventory-chip/spec/ads131m08_interface.md`
-- Clocking unknowns (IP repo): `ip/home-inventory-chip/docs/ADC_CLOCKING_PLAN.md`
+- Clocking notes (IP repo): `ip/home-inventory-chip/docs/ADC_CLOCKING_PLAN.md`
 
 ## Interface signals we must route
 Minimum viable external interface for ADS131M08 data capture:

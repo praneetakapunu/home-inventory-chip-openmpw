@@ -27,7 +27,8 @@ Currently **unused** by v1 (all GPIOs high-Z).
 However, v1 will eventually need GPIO routing for the external ADS131M08 ADC (SPI + DRDY + reset).
 
 Where the plan lives:
-- `docs/source/adc_pinout_plan.md`
+- GPIO mapping plan: `docs/source/adc_pinout_plan.md`
+- Clocking contract (harness-side): `docs/source/adc_clocking_plan.md`
 
 Clocking note: ADS131M08 `CLKIN` is required for real conversions.
 Before enabling any ADC GPIO path for tapeout, we must lock whether:
