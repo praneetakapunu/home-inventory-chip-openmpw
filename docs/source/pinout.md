@@ -29,6 +29,11 @@ However, v1 will eventually need GPIO routing for the external ADS131M08 ADC (SP
 Where the plan lives:
 - `docs/source/adc_pinout_plan.md`
 
+Clocking note: ADS131M08 `CLKIN` is required for real conversions.
+Before enabling any ADC GPIO path for tapeout, we must lock whether:
+- the harness/PCB provides an oscillator into `CLKIN`, or
+- we route and drive `adc_clkin` from the SoC (and at what frequency).
+
 Current wrapper behavior (`verilog/rtl/home_inventory_user_project.v`):
 - Default (no special defines):
   - `io_out` = 0

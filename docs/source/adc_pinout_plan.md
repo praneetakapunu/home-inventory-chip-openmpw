@@ -35,6 +35,28 @@ That means we must close one of these before tapeout:
 
 Tracking decision record (IP repo): `ip/home-inventory-chip/decisions/011-adc-clkin-source-and-frequency.md`.
 
+## CLKIN decision evidence (must include in the lock PR)
+When we claim “ADC clocking is confirmed”, we must be able to point to a *committed* source in this harness repo.
+
+Fill this block in the PR description and paste it into this doc (and the IP repo decision record) when the decision is made:
+
+```text
+Decision: (A) Board oscillator into CLKIN  OR  (B) SoC drives adc_clkin
+Source: (schematic page/link OR docs path + line range)
+Expected CLKIN frequency (Hz):
+Is CLKIN present immediately after reset? (yes/no/unknown)
+If SoC-driven: which clock generator/source net?
+Bring-up verification point: (test pad / scope point / observable behavior)
+```
+
+Fast audit command (from repo root):
+```bash
+rg -n "adc_clkin|ADC_CLKIN|\bCLKIN\b|oscillator|xtal|crystal|CLKOUT" docs verilog rtl src openlane
+```
+
+If the block above cannot be filled with evidence, keep `adc_clkin` marked **optional** and treat clocking as a tapeout blocker.
+
+
 ## Constraints to verify (before we lock pin numbers)
 1) Which `io[*]` pads are available on the OpenMPW harness for user projects.
 2) Whether any pads are pre-used by:
