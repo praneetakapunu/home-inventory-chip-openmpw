@@ -17,15 +17,27 @@ If you are reviewing tapeout readiness, start here, then follow the links into:
 Used for all register reads/writes.
 
 ### Logic Analyzer (LA)
-Not driven by v1 (tied off).
+Not driven by v1.
+
+Normative tie-off behavior:
+- `la_data_out = 0` (deterministic)
+- `la_data_in` is ignored
+- `la_oenb` is ignored
 
 ### GPIO (mprj_io)
 Default: **all high-Z**.
 
+Normative tie-off behavior (default build, with `HOMEINV_ENABLE_ADC_GPIO` *unset*):
+- `io_oeb[*] = 1` (output disabled / high-Z)
+- `io_out[*] = 0` (don’t care when high-Z, but kept deterministic)
+
 Optional (compile-time): ADC GPIO routing can be enabled behind `HOMEINV_ENABLE_ADC_GPIO`, but **must not be enabled for tapeout** until the `io[*]` indices are explicitly locked in `docs/source/adc_pinout_plan.md` and updated in the wrapper.
 
 ### user_irq
-Unused (tied to 0).
+Unused.
+
+Normative tie-off behavior:
+- `user_irq = 0`
 
 ---
 
