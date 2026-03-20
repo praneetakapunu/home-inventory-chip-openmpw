@@ -6,6 +6,7 @@
 
 - [Overview](#overview)
 - [Pinout (v1 contract)](pinout.md)
+- [RTL build flags](rtl_build_flags.md)
 - [Quickstart](#quickstart)
 - [Caravel Integration](#caravel-integration)
   - [Repo Integration](#repo-integration)
