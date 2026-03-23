@@ -95,6 +95,48 @@ When we lock the mapping, we must do all of the following in the same PR (or tig
 3) Add a small directed sim or lint-style check (even a simple `iverilog` compile) that proves the wrapper still builds.
 4) Add/Update a decision record in the IP repo (`chip-inventory/decisions/`) linking to this mapping.
 
+## Implementation notes (wrapper knobs + audits)
+
+### Where the pin numbers live today
+The placeholder GPIO indices currently live in:
+- `verilog/rtl/home_inventory_user_project.v`
+
+They are defined behind `HOMEINV_ENABLE_ADC_GPIO` as parameters:
+- `ADC_SCLK_IO`
+- `ADC_CSN_IO`
+- `ADC_MOSI_IO`
+- `ADC_MISO_IO`
+- `ADC_DRDYN_IO`
+- `ADC_RSTN_IO`
+
+These defaults are **intentionally wrong placeholders** and are expected to fail the placeholder checks.
+
+### How we should “lock” the mapping
+When the harness/PCB mapping is confirmed, prefer to **edit the wrapper RTL** to set the final indices as constants in source control.
+
+Recommended approach:
+1) Replace the placeholder `parameter integer ADC_*_IO = ...;` with `localparam integer ... = <final>;` so they cannot be accidentally overridden at compile-time.
+2) Update `docs/source/pinout.md` with the same `io[*]` mapping.
+3) Make the placeholder checks pass (below).
+
+### Fast audits / placeholder checks (no OpenLane)
+From this harness repo root:
+
+Audit (prints evidence/lines):
+```bash
+../chip-inventory/tools/harness_adc_pinout_audit.sh .
+```
+
+Fail-fast placeholder check (must pass before tapeout):
+```bash
+../chip-inventory/tools/harness_adc_pinout_placeholder_check.sh .
+```
+
+Also run the full placeholder suite (pinout + clocking + DRDY + streaming + WB wiring):
+```bash
+../chip-inventory/tools/harness_placeholder_suite.sh .
+```
+
 ## Open questions
 - Clocking plan: will the board provide `CLKIN`, or do we need to synthesize/route one from Caravel?
 - Do we want to reserve 1–2 extra GPIOs for debug (e.g., “frame_seen” pulse)?
